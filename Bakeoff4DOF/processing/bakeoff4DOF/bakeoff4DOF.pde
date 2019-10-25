@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import garciadelcastillo.dashedlines.*;
 
 //these are variables you should probably leave alone
 int index = 0; //starts at zero-ith trial
@@ -21,6 +22,9 @@ float screenTransY = 0;
 float screenRotation = 0;
 float screenZ = 50f;
 
+// Declare the main DashedLines object
+DashedLines dash;
+
 private class Target
 {
   float x = 0;
@@ -41,6 +45,12 @@ void setup() {
   //don't change this! 
   border = inchToPix(2f); //padding of 1.0 inches
 
+  // Initialize it, passing a reference to the current PApplet
+  dash = new DashedLines(this);
+
+  // Set the dash-gap pattern in pixels
+  dash.pattern(10, 5);
+  
   for (int i=0; i<trialCount; i++) //don't change this! 
   {
     Target t = new Target();
@@ -63,6 +73,7 @@ void draw() {
   background(40); //background is dark grey
   fill(200);
   noStroke();
+  
 
   //shouldn't really modify this printout code unless there is a really good reason to
   if (userDone)
@@ -105,6 +116,9 @@ void draw() {
   fill(255);
   scaffoldControlLogic(); //you are going to want to replace this!
   text("Trial " + (trialIndex+1) + " of " +trialCount, width/2, inchToPix(.8f));
+  
+  dash.line(500, 0, 500, 800);
+  dash.line(0, 400, 1000, 400);
 }
 
 //my example design for control, which is terrible
