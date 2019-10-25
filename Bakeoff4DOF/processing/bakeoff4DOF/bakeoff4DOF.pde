@@ -73,7 +73,6 @@ void draw() {
   background(40); //background is dark grey
   fill(200);
   noStroke();
-  
 
   //shouldn't really modify this printout code unless there is a really good reason to
   if (userDone)
@@ -117,8 +116,21 @@ void draw() {
   scaffoldControlLogic(); //you are going to want to replace this!
   text("Trial " + (trialIndex+1) + " of " +trialCount, width/2, inchToPix(.8f));
   
-  dash.line(500, 0, 500, 800);
-  dash.line(0, 400, 1000, 400);
+  //dash.line(500, 0, 500, 800);
+  //dash.line(0, 400, 1000, 400);
+  int cx = width / 2;
+  int cy = height / 2;
+  
+  // draw the transparent circle in the center
+  ellipseMode(CENTER);
+  noFill();
+  dash.ellipse(cx, cy, 2 * inchToPix(3f), 2 * inchToPix(3f));
+  
+  // draw 4 regions
+  dash.line(0, cy, cx - inchToPix(3f), cy);
+  dash.line(cx, cy + inchToPix(3f), cx, height);
+  dash.line(cx + inchToPix(3f), cy, width, cy);
+  dash.line(cx, 0, cx, cy -  inchToPix(3f));
 }
 
 //my example design for control, which is terrible
@@ -126,22 +138,26 @@ void scaffoldControlLogic()
 {
   //upper left corner, rotate counterclockwise
   text("CCW", inchToPix(.4f), inchToPix(.4f));
-  if (mousePressed && dist(0, 0, mouseX, mouseY)<inchToPix(.8f))
+  //if (mousePressed && dist(0, 0, mouseX, mouseY)<inchToPix(.8f))
+  if (mousePressed && mouseX < width / 2 && mouseY < height / 2)
     screenRotation--;
 
   //upper right corner, rotate clockwise
   text("CW", width-inchToPix(.4f), inchToPix(.4f));
-  if (mousePressed && dist(width, 0, mouseX, mouseY)<inchToPix(.8f))
+  //if (mousePressed && dist(width, 0, mouseX, mouseY)<inchToPix(.8f))
+  if (mousePressed && mouseX > width / 2 && mouseY < height / 2)
     screenRotation++;
 
   //lower left corner, decrease Z
   text("-", inchToPix(.4f), height-inchToPix(.4f));
-  if (mousePressed && dist(0, height, mouseX, mouseY)<inchToPix(.8f))
+  //if (mousePressed && dist(0, height, mouseX, mouseY)<inchToPix(.8f))
+  if (mousePressed && mouseX < width / 2 && mouseY > height / 2)
     screenZ = constrain(screenZ-inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone!
 
   //lower right corner, increase Z
   text("+", width-inchToPix(.4f), height-inchToPix(.4f));
-  if (mousePressed && dist(width, height, mouseX, mouseY)<inchToPix(.8f))
+  //if (mousePressed && dist(width, height, mouseX, mouseY)<inchToPix(.8f))
+  if (mousePressed && mouseX > width / 2 && mouseY > height / 2)
     screenZ = constrain(screenZ+inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone! 
 
   //left middle, move left
@@ -176,6 +192,7 @@ void mousePressed()
 void mouseReleased()
 {
   //check to see if user clicked middle of screen within 3 inches
+  // need to change this logic too: now clicking withint middle of the screen should not 
   if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(3f))
   {
     if (userDone==false && !checkForSuccess())
