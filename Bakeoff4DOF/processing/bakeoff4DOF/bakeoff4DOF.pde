@@ -21,6 +21,10 @@ float screenTransX = 0;
 float screenTransY = 0;
 float screenRotation = 0;
 float screenZ = 50f;
+boolean locked = false;
+float clickDist = (screenZ * sqrt(2));
+float xOffset = 0.0;
+float yOffset = 0.0;
 
 // Declare the main DashedLines object
 DashedLines dash;
@@ -182,6 +186,9 @@ void scaffoldControlLogic()
   //text("down", width/2, height-inchToPix(.4f));
   if (mousePressed && dist(width/2, height, mouseX, mouseY)<inchToPix(.8f))
     screenTransY+=inchToPix(.02f);
+    
+  if(mousePressed && dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist)
+    locked = true;
 }
 
 
@@ -192,8 +199,17 @@ void mousePressed()
     startTime = millis();
     println("time started!");
   }
+  xOffset = mouseX-screenTransX;
+  yOffset = mouseY-screenTransY;
 }
 
+void mouseDragged()
+{
+  if(locked) {
+    screenTransX = mouseX-xOffset;
+    screenTransY = mouseY-yOffset;
+  }
+}
 
 void mouseReleased()
 {
@@ -212,6 +228,7 @@ void mouseReleased()
       finishTime = millis();
     }
   }
+  locked = false;
 }
 
 
