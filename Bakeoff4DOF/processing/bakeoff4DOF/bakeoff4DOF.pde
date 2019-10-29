@@ -82,9 +82,13 @@ void draw() {
   //shouldn't really modify this printout code unless there is a really good reason to
   if (userDone)
   {
+    textSize(20);
     text("User completed " + trialCount + " trials", width/2, inchToPix(.4f));
+    textSize(20);
     text("User had " + errorCount + " error(s)", width/2, inchToPix(.4f)*2);
+    textSize(20);
     text("User took " + (finishTime-startTime)/1000f/trialCount + " sec per target", width/2, inchToPix(.4f)*3);
+    textSize(20);
     text("User took " + ((finishTime-startTime)/1000f/trialCount+(errorCount*errorPenalty)) + " sec per target inc. penalty", width/2, inchToPix(.4f)*4);
     return;
   }
