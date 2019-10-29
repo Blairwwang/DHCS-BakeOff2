@@ -110,7 +110,10 @@ void draw() {
   translate(width/2, height/2); //center the drawing coordinates to the center of the screen
   translate(screenTransX, screenTransY);
   rotate(radians(screenRotation));
-  noFill();
+  if (checkForSuccess()){
+    fill(0,255,0);}
+  else{
+    noFill();}
   strokeWeight(3f);
   stroke(160);
   rect(0, 0, screenZ, screenZ);
@@ -215,7 +218,8 @@ void mouseReleased()
 {
   //check to see if user clicked middle of screen within 3 inches
   // need to change this logic too: now clicking withint middle of the screen should not 
-  if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(3f))
+  //if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(3f))
+  if(checkForSuccess())
   {
     if (userDone==false && !checkForSuccess())
       errorCount++;
