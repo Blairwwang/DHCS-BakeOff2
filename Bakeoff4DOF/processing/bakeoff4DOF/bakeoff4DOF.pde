@@ -208,6 +208,21 @@ void mousePressed()
   }
   xOffset = mouseX-screenTransX;
   yOffset = mouseY-screenTransY;
+  
+  if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(3f) && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist))
+  //if(locked)
+  {
+    if (userDone==false && !checkForSuccess())
+      errorCount++;
+
+    trialIndex++; //and move on to next trial
+
+    if (trialIndex==trialCount && userDone==false)
+    {
+      userDone = true;
+      finishTime = millis();
+    }
+  }
 }
 
 void mouseDragged()
@@ -222,20 +237,7 @@ void mouseReleased()
 {
   //check to see if user clicked middle of screen within 3 inches
   // need to change this logic too: now clicking withint middle of the screen should not 
-  //if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(3f))
-  if(checkForSuccess())
-  {
-    if (userDone==false && !checkForSuccess())
-      errorCount++;
-
-    trialIndex++; //and move on to next trial
-
-    if (trialIndex==trialCount && userDone==false)
-    {
-      userDone = true;
-      finishTime = millis();
-    }
-  }
+  
   locked = false;
 }
 
