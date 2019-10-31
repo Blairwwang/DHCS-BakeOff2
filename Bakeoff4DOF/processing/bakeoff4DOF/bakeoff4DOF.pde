@@ -100,13 +100,21 @@ void draw() {
     translate(width/2, height/2); //center the drawing coordinates to the center of the screen
     Target t = targets.get(i);
     translate(t.x, t.y); //center the drawing coordinates to the center of the screen
+    
     rotate(radians(t.rotation));
     if (trialIndex==i)
       fill(255, 0, 0, 192); //set color to semi translucent
     else
       fill(128, 60, 60, 128); //set color to semi translucent
     rect(0, 0, t.z, t.z);
+    if (trialIndex==i)
+      fill(40); //set color to semi translucent
+    else
+      noFill(); //set color to semi translucent
+    ellipse(0,0,10, 10);
+    
     popMatrix();
+
   }
 
   //===========DRAW CURSOR SQUARE=================
@@ -122,6 +130,13 @@ void draw() {
   stroke(160);
   rect(0, 0, screenZ, screenZ);
   popMatrix();
+  
+  // trying to draw center circle on cursor square
+  ellipseMode(CENTER);
+  noFill();
+  dash.ellipse(screenTransX + width /2, screenTransY + height / 2, 10, 10);
+
+  
 
   //===========DRAW EXAMPLE CONTROLS=================
   fill(255);
@@ -155,14 +170,14 @@ void scaffoldControlLogic()
   //if (mousePressed && dist(0, 0, mouseX, mouseY)<inchToPix(.8f))
   text("Rotate \nLEFT", textMargin, textMargin);
   if (!locked && mousePressed && mouseX < width / 2 && mouseY < height / 2)
-    screenRotation--;
+    screenRotation -= 1;
 
   //upper right corner, rotate clockwise
   //text("CW", width-inchToPix(.4f), inchToPix(.4f));
   text("Rotate \n RIGHT", width - textMargin, textMargin);
   //if (mousePressed && dist(width, 0, mouseX, mouseY)<inchToPix(.8f))
   if (!locked && mousePressed && mouseX > width / 2 && mouseY < height / 2)
-    screenRotation++;
+    screenRotation += 1;
 
   //lower left corner, decrease Z
   //text("-", inchToPix(.4f), height-inchToPix(.4f));
