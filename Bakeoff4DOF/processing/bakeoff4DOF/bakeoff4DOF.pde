@@ -238,7 +238,7 @@ void scaffoldControlLogic()
 void mouseClicked(MouseEvent evt) {
   clickCount += 1;
   println("mouse clicked", clickCount, "mouseX, mouseY, width/2+screenTransX, height/2+screenTransY=", mouseX, mouseY, width/2+screenTransX, height/2+screenTransY, screenZ);
-  if (dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < screenZ * sqrt(2))   {
+  if (dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist)   {
     if (userDone==false && !checkForSuccess())
       errorCount++;
 
