@@ -153,11 +153,24 @@ void draw() {
   noFill();
   dash.ellipse(cx, cy, 2 * inchToPix(3f), 2 * inchToPix(3f));
   
-  // draw 4 regions
+  //// draw 4 regions
+  //dash.line(0, cy, width, cy);
+  //dash.line(cx, 0, cx, height);
+
   dash.line(0, cy, cx - inchToPix(3f), cy);
   dash.line(cx, cy + inchToPix(3f), cx, height);
   dash.line(cx + inchToPix(3f), cy, width, cy);
   dash.line(cx, 0, cx, cy -  inchToPix(3f));
+  
+  // highlight the quadrant that needs to be clicked
+  if (checkForSize() < 0) {
+    fill(0, 0, 255, 50);
+    rect(width * 0.25, height * 0.75, 500, 400);
+  } else if (checkForSize() > 0) {
+    fill(0, 0, 255, 50);
+    rect(width * 0.75, height * 0.75, 500, 400);
+  }
+    
 }
 
 //my example design for control, which is terrible
@@ -254,6 +267,26 @@ void mouseReleased()
   // need to change this logic too: now clicking withint middle of the screen should not 
   
   locked = false;
+}
+
+//return -1 for reducing size, 1 for increasing size, 0 for no change
+public int checkForSize()
+{
+  Target t = targets.get(trialIndex);  
+  boolean closeZ = abs(t.z - screenZ)<inchToPix(.05f); //has to be within +-0.05"  
+  println("checkForSize: Close Enough Z: " +  closeZ + " (cursor Z = " + t.z + ", target Z = " + screenZ +")");
+  if (closeZ) {
+    println("checkForSize returning 0");
+    return 0;
+  }
+  
+  if (t.z > screenZ) {
+    println("checkForSize returning 1");
+    return 1;
+  } else {
+    println("checkForSize returning -1");
+    return -1;
+  }
 }
 
 
