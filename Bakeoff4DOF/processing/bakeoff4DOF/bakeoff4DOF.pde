@@ -75,7 +75,7 @@ void setup() {
 
 void draw() {
 
-  background(40); //background is dark grey
+  background(255); //background is dark grey
   fill(200);
   noStroke();
 
@@ -163,11 +163,11 @@ void draw() {
   dash.line(cx, 0, cx, cy -  inchToPix(3f));
   
   // highlight the quadrant that needs to be clicked
+  noStroke();
+  fill(0, 0, 255, 50);
   if (checkForSize() < 0) {
-    fill(0, 0, 255, 50);
     rect(width * 0.25, height * 0.75, 500, 400);
   } else if (checkForSize() > 0) {
-    fill(0, 0, 255, 50);
     rect(width * 0.75, height * 0.75, 500, 400);
   }
     
@@ -181,26 +181,27 @@ void scaffoldControlLogic()
   //text("CCW", inchToPix(.4f), inchToPix(.4f));
   
   //if (mousePressed && dist(0, 0, mouseX, mouseY)<inchToPix(.8f))
-  text("Rotate \nLEFT", textMargin, textMargin);
+  fill(120);
+  text("CCW", textMargin, textMargin);
   if (!locked && mousePressed && mouseX < width / 2 && mouseY < height / 2)
     screenRotation -= 1;
 
   //upper right corner, rotate clockwise
   //text("CW", width-inchToPix(.4f), inchToPix(.4f));
-  text("Rotate \n RIGHT", width - textMargin, textMargin);
+  text("CW", width - textMargin, textMargin);
   //if (mousePressed && dist(width, 0, mouseX, mouseY)<inchToPix(.8f))
   if (!locked && mousePressed && mouseX > width / 2 && mouseY < height / 2)
     screenRotation += 1;
 
   //lower left corner, decrease Z
   //text("-", inchToPix(.4f), height-inchToPix(.4f));
-  text("Size -", textMargin, height - textMargin);
+  text("-", textMargin, height - textMargin);
   //if (mousePressed && dist(0, height, mouseX, mouseY)<inchToPix(.8f))
   if (!locked && mousePressed && mouseX < width / 2 && mouseY > height / 2)
     screenZ = constrain(screenZ-inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone!
 
   //lower right corner, increase Z
-  text("Size +", width-textMargin, height-textMargin);
+  text("+", width-textMargin, height-textMargin);
   //if (mousePressed && dist(width, height, mouseX, mouseY)<inchToPix(.8f))
   if (!locked && mousePressed && mouseX > width / 2 && mouseY > height / 2)
     screenZ = constrain(screenZ+inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone! 
