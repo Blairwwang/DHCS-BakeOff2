@@ -108,7 +108,7 @@ void draw() {
       fill(128, 60, 60, 128); //set color to semi translucent
     rect(0, 0, t.z, t.z);
     if (trialIndex==i)
-      fill(40); //set color to semi translucent
+      fill(100); //set color to semi translucent
     else
       noFill(); //set color to semi translucent
     ellipse(0,0,10, 10);
@@ -127,7 +127,8 @@ void draw() {
   else{
     noFill();}
   strokeWeight(3f);
-  stroke(160);
+  //stroke(160);
+  stroke(0);
   rect(0, 0, screenZ, screenZ);
   popMatrix();
   
@@ -162,15 +163,23 @@ void draw() {
   dash.line(cx + inchToPix(3f), cy, width, cy);
   dash.line(cx, 0, cx, cy -  inchToPix(3f));
   
-  // highlight the quadrant that needs to be clicked
+  // highlight the size quadrant that needs to be clicked
   noStroke();
-  fill(0, 0, 255, 50);
-  if (checkForSize() < 0) {
+  fill(0, 0, 255, 20);
+  int sizeCheck = checkForSize();
+  if (sizeCheck < 0) {
     rect(width * 0.25, height * 0.75, 500, 400);
-  } else if (checkForSize() > 0) {
+  } else if (sizeCheck > 0) {
     rect(width * 0.75, height * 0.75, 500, 400);
   }
     
+  // highlight the rotation quadrant that needs to be clicked
+  int rotateCheck = checkForRotate();
+  if (rotateCheck < 0) {
+    rect(width * 0.25, height * 0.25, 500, 400);
+  } else if (rotateCheck > 0) {
+    rect(width * 0.75, height * 0.25, 500, 400);
+  }
 }
 
 //my example design for control, which is terrible
@@ -275,21 +284,36 @@ public int checkForSize()
 {
   Target t = targets.get(trialIndex);  
   boolean closeZ = abs(t.z - screenZ)<inchToPix(.05f); //has to be within +-0.05"  
-  println("checkForSize: Close Enough Z: " +  closeZ + " (cursor Z = " + t.z + ", target Z = " + screenZ +")");
   if (closeZ) {
-    println("checkForSize returning 0");
     return 0;
   }
-  
   if (t.z > screenZ) {
-    println("checkForSize returning 1");
     return 1;
   } else {
-    println("checkForSize returning -1");
     return -1;
   }
 }
 
+//return -1 for CCW, 1 for CW, 0 for no change
+public int checkForRotate()
+{
+  Target t = targets.get(trialIndex);  
+  boolean closeRotation = calculateDifferenceBetweenAngles(t.rotation, screenRotation)<=5;
+  if (closeRotation) {
+    println("checkForRotate return 0");
+    return 0;
+  }
+  //double degree = calculateRotate(t.rotation, screenRotation);
+  //if (degree > 45) {
+  //  println("checkForRotate return 1");
+  //  return 1;
+  //} else {
+  //  println("checkForRotate return -1");
+  //  return -1;
+  //}
+  int result = calculateRotate(t.rotation, screenRotation);
+  return result;
+}
 
 //probably shouldn't modify this, but email me if you want to for some good reason.
 public boolean checkForSuccess()
@@ -316,6 +340,46 @@ double calculateDifferenceBetweenAngles(float a1, float a2)
     return 90-diff;
   else
     return diff;
+}
+
+//utility function I include to calc diference between two angles
+int calculateRotate(float a1, float a2)
+{
+  a1 %= 90;
+  if (a1 < 0) {
+    a1 += 90;
+  }
+  a2 %= 90;
+  if (a2 < 0) {
+    a2 += 90;
+  }
+  println( "calculateRotate, a1=", a1, "a2=", a2);
+
+  if (a1 < a2) {
+    if (a2 - a1 > 45) {
+      return 1;
+    } else {
+      return -1;
+    }
+  } else {
+    if (a1 - a2 > 45) {
+      return -1;
+    } else {
+      return 1;
+    }
+  }
+  //return diff;
+  //if (diff < 45) {
+  //  if (a1 + diff == a2) {
+  //    return -1;
+  //  }
+  //  return 1;
+  //} else { // diff > 45
+  //  if (a1 + diff == a2) {
+  //    return 1;
+  //  }
+  //  return -1;
+  //}
 }
 
 //utility function to convert inches into pixels based on screen PPI
