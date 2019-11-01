@@ -156,8 +156,9 @@ void draw() {
   //ellipse(cx, cy, 2 * inchToPix(3f), 2 * inchToPix(3f));
   
   // draw 4 regions
-  dash.line(0, cy, width, cy);
-  dash.line(cx, 0, cx, height);
+  dash.line(0, cy+screenTransY, width, cy+screenTransY);
+  dash.line(cx+screenTransX, 0, cx+screenTransX, height);
+  
 
   //dash.line(0, cy, cx - inchToPix(3f), cy);
   //dash.line(cx, cy + inchToPix(3f), cx, height);
@@ -169,19 +170,24 @@ void draw() {
   fill(0, 0, 255, 20);
   int sizeCheck = checkForSize();
   if (sizeCheck < 0) {
-    rect(width * 0.25, height * 0.75, 500, 400);
+    rect((width/2+screenTransX)/2, (height/2+screenTransY)+(height/2-screenTransY)/2, 
+    width/2+screenTransX, height/2-screenTransY);
   } else if (sizeCheck > 0) {
-    rect(width * 0.75, height * 0.75, 500, 400);
+    rect((width/2+screenTransX)+(width/2-screenTransX)/2, (height/2+screenTransY)+(height/2-screenTransY)/2, 
+    width/2-screenTransX, height/2-screenTransY);
   }
     
   // highlight the rotation quadrant that needs to be clicked
   int rotateCheck = checkForRotate();
   if (rotateCheck < 0) {
-    rect(width * 0.25, height * 0.25, 500, 400);
+    rect((width/2+screenTransX)/2, (height/2+screenTransY)/2, 
+    width/2+screenTransX, height/2+screenTransY);
   } else if (rotateCheck > 0) {
-    rect(width * 0.75, height * 0.25, 500, 400);
+    rect((width/2+screenTransX)+(width/2-screenTransX)/2, (height/2+screenTransY)/2, 
+    width/2-screenTransX, height/2+screenTransY);
   }
 }
+  
 
 //my example design for control, which is terrible
 void scaffoldControlLogic()
@@ -193,27 +199,31 @@ void scaffoldControlLogic()
   //if (mousePressed && dist(0, 0, mouseX, mouseY)<inchToPix(.8f))
   fill(120);
   text("CCW", textMargin, textMargin);
-  if (!locked && mousePressed && mouseX < width / 2 && mouseY < height / 2 && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist))
+  if (!locked && mousePressed && mouseX < (width/2+screenTransX) && mouseY < (height/2+screenTransY) 
+      && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist))
     screenRotation -= 1;
 
   //upper right corner, rotate clockwise
   //text("CW", width-inchToPix(.4f), inchToPix(.4f));
   text("CW", width - textMargin, textMargin);
   //if (mousePressed && dist(width, 0, mouseX, mouseY)<inchToPix(.8f))
-  if (!locked && mousePressed && mouseX > width / 2 && mouseY < height / 2&& !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist))
+  if (!locked && mousePressed && mouseX > (width/2+screenTransX) && mouseY < (height/2+screenTransY) 
+      && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist))
     screenRotation += 1;
 
   //lower left corner, decrease Z
   //text("-", inchToPix(.4f), height-inchToPix(.4f));
   text("-", textMargin, height - textMargin);
   //if (mousePressed && dist(0, height, mouseX, mouseY)<inchToPix(.8f))
-  if (!locked && mousePressed && mouseX < width / 2 && mouseY > height / 2&& !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist))
+  if (!locked && mousePressed && mouseX < (width/2+screenTransX) && mouseY > (height/2+screenTransY)
+      && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist))
     screenZ = constrain(screenZ-inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone!
 
   //lower right corner, increase Z
   text("+", width-textMargin, height-textMargin);
   //if (mousePressed && dist(width, height, mouseX, mouseY)<inchToPix(.8f))
-  if (!locked && mousePressed && mouseX > width / 2 && mouseY > height / 2&& !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist))
+  if (!locked && mousePressed && mouseX > (width/2+screenTransX) && mouseY > (height/2+screenTransY)
+      && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist))
     screenZ = constrain(screenZ+inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone! 
 
   //left middle, move left
