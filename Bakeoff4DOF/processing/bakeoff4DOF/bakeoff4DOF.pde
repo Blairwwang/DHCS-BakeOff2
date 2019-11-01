@@ -23,7 +23,7 @@ float screenTransY = 0;
 float screenRotation = 0;
 float screenZ = 50f;
 boolean locked = false;
-float clickDist = (screenZ * sqrt(2));
+float clickDist = (screenZ * 0.5 * sqrt(2));
 float xOffset = 0.0;
 float yOffset = 0.0;
 
