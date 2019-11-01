@@ -23,7 +23,6 @@ float screenTransY = 0;
 float screenRotation = 0;
 float screenZ = 50f;
 boolean locked = false;
-float clickDist = (screenZ * 0.5 * sqrt(2));
 float xOffset = 0.0;
 float yOffset = 0.0;
 
@@ -75,7 +74,6 @@ void setup() {
 
 
 void draw() {
-
   background(255); //background is dark grey
   fill(200);
   noStroke();
@@ -200,7 +198,7 @@ void scaffoldControlLogic()
   fill(120);
   text("CCW", textMargin, textMargin);
   if (!locked && mousePressed && mouseX < (width/2+screenTransX) && mouseY < (height/2+screenTransY) 
-      && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist))
+      && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < (screenZ * 0.5 * sqrt(2))))
     screenRotation -= 1;
 
   //upper right corner, rotate clockwise
@@ -208,7 +206,7 @@ void scaffoldControlLogic()
   text("CW", width - textMargin, textMargin);
   //if (mousePressed && dist(width, 0, mouseX, mouseY)<inchToPix(.8f))
   if (!locked && mousePressed && mouseX > (width/2+screenTransX) && mouseY < (height/2+screenTransY) 
-      && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist))
+      && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < (screenZ * 0.5 * sqrt(2))))
     screenRotation += 1;
 
   //lower left corner, decrease Z
@@ -216,14 +214,14 @@ void scaffoldControlLogic()
   text("-", textMargin, height - textMargin);
   //if (mousePressed && dist(0, height, mouseX, mouseY)<inchToPix(.8f))
   if (!locked && mousePressed && mouseX < (width/2+screenTransX) && mouseY > (height/2+screenTransY)
-      && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist))
+      && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < (screenZ * 0.5 * sqrt(2))))
     screenZ = constrain(screenZ-inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone!
 
   //lower right corner, increase Z
   text("+", width-textMargin, height-textMargin);
   //if (mousePressed && dist(width, height, mouseX, mouseY)<inchToPix(.8f))
   if (!locked && mousePressed && mouseX > (width/2+screenTransX) && mouseY > (height/2+screenTransY)
-      && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist))
+      && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < (screenZ * 0.5 * sqrt(2))))
     screenZ = constrain(screenZ+inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone! 
 
   //left middle, move left
@@ -240,7 +238,7 @@ void scaffoldControlLogic()
   if (mousePressed && dist(width/2, height, mouseX, mouseY)<inchToPix(.8f))
     screenTransY+=inchToPix(.02f);
    */
-  if(mousePressed && dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist)
+  if(mousePressed && dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < (screenZ * 0.5 * sqrt(2)))
     locked = true;
 }
 
@@ -248,7 +246,7 @@ void scaffoldControlLogic()
 void mouseClicked(MouseEvent evt) {
   clickCount += 1;
   println("mouse clicked", clickCount, "mouseX, mouseY, width/2+screenTransX, height/2+screenTransY=", mouseX, mouseY, width/2+screenTransX, height/2+screenTransY, screenZ);
-  if (dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist)   {
+  if (dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < (screenZ * 0.5 * sqrt(2)))   {
     if (userDone==false && !checkForSuccess())
       errorCount++;
 
@@ -273,7 +271,7 @@ void mousePressed()
   xOffset = mouseX-screenTransX;
   yOffset = mouseY-screenTransY;
   
-  //if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(3f) && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist))
+  //if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(3f) && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < (screenZ * 0.5 * sqrt(2))))
   ////if(locked)
   //{
   //  if (userDone==false && !checkForSuccess())
@@ -340,7 +338,7 @@ public boolean checkForSuccess()
   boolean closeDist = dist(t.x, t.y, screenTransX, screenTransY)<inchToPix(.05f); //has to be within +-0.05"
   boolean closeRotation = calculateDifferenceBetweenAngles(t.rotation, screenRotation)<=5;
   boolean closeZ = abs(t.z - screenZ)<inchToPix(.05f); //has to be within +-0.05"  
-
+  println("screenZ=", screenZ);
   println("Close Enough Distance: " + closeDist + " (cursor X/Y = " + t.x + "/" + t.y + ", target X/Y = " + screenTransX + "/" + screenTransY +")");
   println("Close Enough Rotation: " + closeRotation + " (rot dist="+calculateDifferenceBetweenAngles(t.rotation, screenRotation)+")");
   println("Close Enough Z: " +  closeZ + " (cursor Z = " + t.z + ", target Z = " + screenZ +")");
