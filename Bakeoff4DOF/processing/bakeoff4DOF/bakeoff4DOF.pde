@@ -1,3 +1,4 @@
+
 import java.util.ArrayList;
 import java.util.Collections;
 import garciadelcastillo.dashedlines.*;
@@ -12,7 +13,7 @@ float errorPenalty = 0.5f; //for every error, add this value to mean time
 int startTime = 0; // time starts when the first click is captured
 int finishTime = 0; //records the time of the final click
 boolean userDone = false; //is the user done
-
+int clickCount = 0;
 final int screenPPI = 72; //what is the DPI of the screen you are using
 //you can test this by drawing a 72x72 pixel rectangle in code, and then confirming with a ruler it is 1x1 inch. 
 
@@ -22,7 +23,6 @@ float screenTransY = 0;
 float screenRotation = 0;
 float screenZ = 50f;
 boolean locked = false;
-float clickDist = (screenZ * sqrt(2));
 float xOffset = 0.0;
 float yOffset = 0.0;
 
@@ -74,8 +74,7 @@ void setup() {
 
 
 void draw() {
-
-  background(40); //background is dark grey
+  background(255); //background is dark grey
   fill(200);
   noStroke();
 
@@ -100,13 +99,21 @@ void draw() {
     translate(width/2, height/2); //center the drawing coordinates to the center of the screen
     Target t = targets.get(i);
     translate(t.x, t.y); //center the drawing coordinates to the center of the screen
+    
     rotate(radians(t.rotation));
     if (trialIndex==i)
       fill(255, 0, 0, 192); //set color to semi translucent
     else
       fill(128, 60, 60, 128); //set color to semi translucent
     rect(0, 0, t.z, t.z);
+    if (trialIndex==i)
+      fill(100); //set color to semi translucent
+    else
+      noFill(); //set color to semi translucent
+    ellipse(0,0,10, 10);
+    
     popMatrix();
+
   }
 
   //===========DRAW CURSOR SQUARE=================
@@ -119,9 +126,17 @@ void draw() {
   else{
     noFill();}
   strokeWeight(3f);
-  stroke(160);
+  //stroke(160);
+  stroke(0);
   rect(0, 0, screenZ, screenZ);
   popMatrix();
+  
+  // trying to draw center circle on cursor square
+  ellipseMode(CENTER);
+  noFill();
+  dash.ellipse(screenTransX + width /2, screenTransY + height / 2, 10, 10);
+
+  
 
   //===========DRAW EXAMPLE CONTROLS=================
   fill(255);
@@ -133,17 +148,44 @@ void draw() {
   int cx = width / 2;
   int cy = height / 2;
   
-  // draw the transparent circle in the center
-  ellipseMode(CENTER);
-  noFill();
-  dash.ellipse(cx, cy, 2 * inchToPix(3f), 2 * inchToPix(3f));
+  //// draw the transparent circle in the center
+  //ellipseMode(CENTER);
+  //noFill();
+  //ellipse(cx, cy, 2 * inchToPix(3f), 2 * inchToPix(3f));
   
   // draw 4 regions
-  dash.line(0, cy, cx - inchToPix(3f), cy);
-  dash.line(cx, cy + inchToPix(3f), cx, height);
-  dash.line(cx + inchToPix(3f), cy, width, cy);
-  dash.line(cx, 0, cx, cy -  inchToPix(3f));
+  dash.line(0, cy+screenTransY, width, cy+screenTransY);
+  dash.line(cx+screenTransX, 0, cx+screenTransX, height);
+  
+
+  //dash.line(0, cy, cx - inchToPix(3f), cy);
+  //dash.line(cx, cy + inchToPix(3f), cx, height);
+  //dash.line(cx + inchToPix(3f), cy, width, cy);
+  //dash.line(cx, 0, cx, cy -  inchToPix(3f));
+  
+  // highlight the size quadrant that needs to be clicked
+  noStroke();
+  fill(0, 0, 255, 20);
+  int sizeCheck = checkForSize();
+  if (sizeCheck < 0) {
+    rect((width/2+screenTransX)/2, (height/2+screenTransY)+(height/2-screenTransY)/2, 
+    width/2+screenTransX, height/2-screenTransY);
+  } else if (sizeCheck > 0) {
+    rect((width/2+screenTransX)+(width/2-screenTransX)/2, (height/2+screenTransY)+(height/2-screenTransY)/2, 
+    width/2-screenTransX, height/2-screenTransY);
+  }
+    
+  // highlight the rotation quadrant that needs to be clicked
+  int rotateCheck = checkForRotate();
+  if (rotateCheck < 0) {
+    rect((width/2+screenTransX)/2, (height/2+screenTransY)/2, 
+    width/2+screenTransX, height/2+screenTransY);
+  } else if (rotateCheck > 0) {
+    rect((width/2+screenTransX)+(width/2-screenTransX)/2, (height/2+screenTransY)/2, 
+    width/2-screenTransX, height/2+screenTransY);
+  }
 }
+  
 
 //my example design for control, which is terrible
 void scaffoldControlLogic()
@@ -153,49 +195,69 @@ void scaffoldControlLogic()
   //text("CCW", inchToPix(.4f), inchToPix(.4f));
   
   //if (mousePressed && dist(0, 0, mouseX, mouseY)<inchToPix(.8f))
-  text("Rotate \nLEFT", textMargin, textMargin);
-  if (!locked && mousePressed && mouseX < width / 2 && mouseY < height / 2)
-    screenRotation--;
+  fill(120);
+  text("CCW", textMargin, textMargin);
+  if (!locked && mousePressed && mouseX < (width/2+screenTransX) && mouseY < (height/2+screenTransY) 
+      && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < (screenZ * 0.5 * sqrt(2))))
+    screenRotation -= 1;
 
   //upper right corner, rotate clockwise
   //text("CW", width-inchToPix(.4f), inchToPix(.4f));
-  text("Rotate \n RIGHT", width - textMargin, textMargin);
+  text("CW", width - textMargin, textMargin);
   //if (mousePressed && dist(width, 0, mouseX, mouseY)<inchToPix(.8f))
-  if (!locked && mousePressed && mouseX > width / 2 && mouseY < height / 2)
-    screenRotation++;
+  if (!locked && mousePressed && mouseX > (width/2+screenTransX) && mouseY < (height/2+screenTransY) 
+      && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < (screenZ * 0.5 * sqrt(2))))
+    screenRotation += 1;
 
   //lower left corner, decrease Z
   //text("-", inchToPix(.4f), height-inchToPix(.4f));
-  text("Size -", textMargin, height - textMargin);
+  text("-", textMargin, height - textMargin);
   //if (mousePressed && dist(0, height, mouseX, mouseY)<inchToPix(.8f))
-  if (!locked && mousePressed && mouseX < width / 2 && mouseY > height / 2)
+  if (!locked && mousePressed && mouseX < (width/2+screenTransX) && mouseY > (height/2+screenTransY)
+      && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < (screenZ * 0.5 * sqrt(2))))
     screenZ = constrain(screenZ-inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone!
 
   //lower right corner, increase Z
-  text("Size +", width-textMargin, height-textMargin);
+  text("+", width-textMargin, height-textMargin);
   //if (mousePressed && dist(width, height, mouseX, mouseY)<inchToPix(.8f))
-  if (!locked && mousePressed && mouseX > width / 2 && mouseY > height / 2)
+  if (!locked && mousePressed && mouseX > (width/2+screenTransX) && mouseY > (height/2+screenTransY)
+      && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < (screenZ * 0.5 * sqrt(2))))
     screenZ = constrain(screenZ+inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone! 
 
   //left middle, move left
   //text("left", inchToPix(.4f), height/2);
   /*if (mousePressed && dist(0, height/2, mouseX, mouseY)<inchToPix(.8f))
     screenTransX-=inchToPix(.02f);
-
   //text("right", width-inchToPix(.4f), height/2);
   if (mousePressed && dist(width, height/2, mouseX, mouseY)<inchToPix(.8f))
     screenTransX+=inchToPix(.02f);
-
   //text("up", width/2, inchToPix(.4f));
   if (mousePressed && dist(width/2, 0, mouseX, mouseY)<inchToPix(.8f))
     screenTransY-=inchToPix(.02f);
-
   //text("down", width/2, height-inchToPix(.4f));
   if (mousePressed && dist(width/2, height, mouseX, mouseY)<inchToPix(.8f))
     screenTransY+=inchToPix(.02f);
    */
-  if(mousePressed && dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist)
+  if(mousePressed && dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < (screenZ * 0.5 * sqrt(2)))
     locked = true;
+}
+
+// NOTE: must tab, instead of pressing down
+void mouseClicked(MouseEvent evt) {
+  clickCount += 1;
+  println("mouse clicked", clickCount, "mouseX, mouseY, width/2+screenTransX, height/2+screenTransY=", mouseX, mouseY, width/2+screenTransX, height/2+screenTransY, screenZ);
+  if (dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < (screenZ * 0.5 * sqrt(2)))   {
+    if (userDone==false && !checkForSuccess())
+      errorCount++;
+
+    trialIndex++; //and move on to next trial
+
+    if (trialIndex==trialCount && userDone==false)
+    {
+      userDone = true;
+      finishTime = millis();
+    }
+  }
 }
 
 
@@ -209,20 +271,20 @@ void mousePressed()
   xOffset = mouseX-screenTransX;
   yOffset = mouseY-screenTransY;
   
-  if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(3f) && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < clickDist))
-  //if(locked)
-  {
-    if (userDone==false && !checkForSuccess())
-      errorCount++;
+  //if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(3f) && !(dist(mouseX, mouseY, width/2+screenTransX, height/2+screenTransY) < (screenZ * 0.5 * sqrt(2))))
+  ////if(locked)
+  //{
+  //  if (userDone==false && !checkForSuccess())
+  //    errorCount++;
 
-    trialIndex++; //and move on to next trial
+  //  trialIndex++; //and move on to next trial
 
-    if (trialIndex==trialCount && userDone==false)
-    {
-      userDone = true;
-      finishTime = millis();
-    }
-  }
+  //  if (trialIndex==trialCount && userDone==false)
+  //  {
+  //    userDone = true;
+  //    finishTime = millis();
+  //  }
+  //}
 }
 
 void mouseDragged()
@@ -241,15 +303,42 @@ void mouseReleased()
   locked = false;
 }
 
+//return -1 for reducing size, 1 for increasing size, 0 for no change
+public int checkForSize()
+{
+  Target t = targets.get(trialIndex);  
+  boolean closeZ = abs(t.z - screenZ)<inchToPix(.05f); //has to be within +-0.05"  
+  if (closeZ) {
+    return 0;
+  }
+  if (t.z > screenZ) {
+    return 1;
+  } else {
+    return -1;
+  }
+}
+
+//return -1 for CCW, 1 for CW, 0 for no change
+public int checkForRotate()
+{
+  Target t = targets.get(trialIndex);  
+  boolean closeRotation = calculateDifferenceBetweenAngles(t.rotation, screenRotation)<=5;
+  if (closeRotation) {
+    println("checkForRotate return 0");
+    return 0;
+  }
+  int result = calculateRotate(t.rotation, screenRotation);
+  return result;
+}
 
 //probably shouldn't modify this, but email me if you want to for some good reason.
 public boolean checkForSuccess()
 {
-  Target t = targets.get(trialIndex);	
+  Target t = targets.get(trialIndex);  
   boolean closeDist = dist(t.x, t.y, screenTransX, screenTransY)<inchToPix(.05f); //has to be within +-0.05"
   boolean closeRotation = calculateDifferenceBetweenAngles(t.rotation, screenRotation)<=5;
-  boolean closeZ = abs(t.z - screenZ)<inchToPix(.05f); //has to be within +-0.05"	
-
+  boolean closeZ = abs(t.z - screenZ)<inchToPix(.05f); //has to be within +-0.05"  
+  println("screenZ=", screenZ);
   println("Close Enough Distance: " + closeDist + " (cursor X/Y = " + t.x + "/" + t.y + ", target X/Y = " + screenTransX + "/" + screenTransY +")");
   println("Close Enough Rotation: " + closeRotation + " (rot dist="+calculateDifferenceBetweenAngles(t.rotation, screenRotation)+")");
   println("Close Enough Z: " +  closeZ + " (cursor Z = " + t.z + ", target Z = " + screenZ +")");
@@ -267,6 +356,34 @@ double calculateDifferenceBetweenAngles(float a1, float a2)
     return 90-diff;
   else
     return diff;
+}
+
+//utility function I include to calc diference between two angles
+int calculateRotate(float a1, float a2)
+{
+  a1 %= 90;
+  if (a1 < 0) {
+    a1 += 90;
+  }
+  a2 %= 90;
+  if (a2 < 0) {
+    a2 += 90;
+  }
+  println( "calculateRotate, a1=", a1, "a2=", a2);
+
+  if (a1 < a2) {
+    if (a2 - a1 > 45) {
+      return 1;
+    } else {
+      return -1;
+    }
+  } else {
+    if (a1 - a2 > 45) {
+      return -1;
+    } else {
+      return 1;
+    }
+  }
 }
 
 //utility function to convert inches into pixels based on screen PPI
