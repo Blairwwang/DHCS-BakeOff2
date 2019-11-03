@@ -104,7 +104,7 @@ void draw() {
     if (trialIndex==i)
       fill(255, 0, 0, 192); //set color to semi translucent
     else
-      fill(128, 60, 60, 128); //set color to semi translucent
+      fill(128, 60, 60, 20); //set color to semi translucent
     rect(0, 0, t.z, t.z);
     if (trialIndex==i)
       fill(100); //set color to semi translucent
@@ -165,7 +165,7 @@ void draw() {
   
   // highlight the size quadrant that needs to be clicked
   noStroke();
-  fill(0, 0, 255, 20);
+  fill(255, 255, 0, 40);
   int sizeCheck = checkForSize();
   if (sizeCheck < 0) {
     rect((width/2+screenTransX)/2, (height/2+screenTransY)+(height/2-screenTransY)/2, 
