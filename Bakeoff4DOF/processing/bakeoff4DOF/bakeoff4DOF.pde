@@ -46,7 +46,7 @@ void setup() {
   textFont(createFont("Arial", inchToPix(.3f))); //sets the font to Arial that is 0.3" tall
   textAlign(CENTER);
   
-  textSize(55);
+  textSize(30);
   //don't change this! 
   border = inchToPix(2f); //padding of 1.0 inches
 
@@ -110,7 +110,7 @@ void draw() {
       fill(100); //set color to semi translucent
     else
       noFill(); //set color to semi translucent
-    ellipse(0,0,10, 10);
+    ellipse(0,0,15, 15);
     
     popMatrix();
 
@@ -134,7 +134,7 @@ void draw() {
   // trying to draw center circle on cursor square
   ellipseMode(CENTER);
   noFill();
-  dash.ellipse(screenTransX + width /2, screenTransY + height / 2, 10, 10);
+  dash.ellipse(screenTransX + width /2, screenTransY + height / 2, 15, 15);
 
   
 
@@ -190,7 +190,8 @@ void draw() {
 //my example design for control, which is terrible
 void scaffoldControlLogic()
 {
-  int textMargin = 200;
+  //int textMargin = 200;
+  int textMargin = 40;
   //upper left corner, rotate counterclockwise
   //text("CCW", inchToPix(.4f), inchToPix(.4f));
   
